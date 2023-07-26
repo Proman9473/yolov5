@@ -303,6 +303,8 @@ class LoadImages:
             im0 = cv2.imread(str(path))  # BGR
             assert im0 is not None, f'Image Not Found {path}'
             s = f'image {self.count}/{self.nf} {path}: '
+            area_coordinates = (1, 1027, 1530, 66)
+            im0 = im0[1:area_coordinates[1], 1:im0.shape[1]]
 
         if self.transforms:
             im = self.transforms(im0)  # transforms
