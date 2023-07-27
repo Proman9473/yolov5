@@ -197,8 +197,11 @@ def run(
                     # let's assume the label_path is the path to the saved label for this image
                     label_path = save_path.replace(".tif", ".txt")
 
-                    # call SEM_Sensor functions on the image and its label
-                    annotations = SEM_Sensor.read_yolo_annotations(label_path)
+                    try:
+                        annotations = SEM_Sensor.read_yolo_annotations(label_path)
+                    except FileNotFoundError:
+                        print(f"No label found for {label_path}")
+                        continue
                     SEM_Sensor.plot_annotations_with_widths(save_path, annotations,
                                                             HFW)  # You may replace 8.29 with the HFW of your SEM
                     SEM_Sensor.analyze_image(save_path, label_path, HFW)
