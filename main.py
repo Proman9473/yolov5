@@ -24,7 +24,7 @@ class AppDemo(QWidget):
         self.setLayout(QVBoxLayout())
 
         # Source Path
-        self.source_label = QLabel('Source Path:')
+        self.source_label = QLabel('Images Path:')
         self.layout().addWidget(self.source_label)
 
         self.source_entry = QLineEdit()
@@ -35,7 +35,7 @@ class AppDemo(QWidget):
         self.layout().addWidget(self.source_button)
 
         # Project Path
-        self.project_label = QLabel('Project Path:')
+        self.project_label = QLabel('Saving Path:')
         self.layout().addWidget(self.project_label)
 
         self.project_entry = QLineEdit()
