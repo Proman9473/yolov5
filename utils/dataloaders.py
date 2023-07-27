@@ -239,23 +239,19 @@ class LoadScreenshots:
 class LoadImages:
     # YOLOv5 image/video dataloader, i.e. `python detect.py --source image.jpg/vid.mp4`
     def __init__(self, path, img_size=640, stride=32, auto=True, transforms=None, vid_stride=1):
-        if isinstance(path, str) and Path(path).suffix == '.txt':  # *.txt file with img/vid/dir on each line
-            path = Path(path).read_text().rsplit()
-        files = []
-        for p in sorted(path) if isinstance(path, (list, tuple)) else [path]:
-            p = str(Path(p).resolve())
-            if '*' in p:
-                files.extend(sorted(glob.glob(p, recursive=True)))  # glob
-            elif os.path.isdir(p):
-                files.extend(sorted(glob.glob(os.path.join(p, '*.*'))))  # dir
-            elif os.path.isfile(p):
-                files.append(p)  # files
-            else:
-                raise FileNotFoundError(f'{p} does not exist')
+        p = Path(path)
+        files = sorted(p.rglob('*.*')) if p.is_dir() else [p]  # get image files in nested directories
 
-        images = [x for x in files if x.split('.')[-1].lower() in IMG_FORMATS]
-        videos = [x for x in files if x.split('.')[-1].lower() in VID_FORMATS]
+        # Check files
+        for i, f in enumerate(files):  # check files
+            if not f.exists():
+                raise FileNotFoundError(f'{f} does not exist')
+
+
+        images = [x for x in files if x.suffix[1:].lower() in IMG_FORMATS]
+        videos = [x for x in files if x.suffix[1:].lower() in VID_FORMATS]
         ni, nv = len(images), len(videos)
+
 
         self.img_size = img_size
         self.stride = stride
@@ -304,9 +300,11 @@ class LoadImages:
         else:
             # Read image
             self.count += 1
-            im0 = cv2.imread(path)  # BGR
+            im0 = cv2.imread(str(path))  # BGR
             assert im0 is not None, f'Image Not Found {path}'
             s = f'image {self.count}/{self.nf} {path}: '
+            area_coordinates = (1, 1027, 1530, 66)
+            im0 = im0[1:area_coordinates[1], 1:im0.shape[1]]
 
         if self.transforms:
             im = self.transforms(im0)  # transforms
