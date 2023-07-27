@@ -28,6 +28,12 @@ Usage - formats:
                                  yolov5s_paddle_model       # PaddlePaddle
 """
 import SEM_Sensor
+import tkinter as tk
+from tkinter import filedialog
+from tkinter import simpledialog
+import os
+import subprocess
+
 import argparse
 import os
 import platform
@@ -79,6 +85,7 @@ def run(
         half=False,  # use FP16 half-precision inference
         dnn=False,  # use OpenCV DNN for ONNX inference
         vid_stride=1,  # video frame-rate stride
+        HFW=None,  # add hfw parameter to the function signature
 ):
     source = str(source)
     save_img = not nosave and not source.endswith('.txt')  # save inference images
@@ -193,8 +200,8 @@ def run(
                     # call SEM_Sensor functions on the image and its label
                     annotations = SEM_Sensor.read_yolo_annotations(label_path)
                     SEM_Sensor.plot_annotations_with_widths(save_path, annotations,
-                                                            HFW=8.29)  # You may replace 8.29 with the HFW of your SEM
-                    SEM_Sensor.analyze_image(save_path, label_path, HFW=8.29)
+                                                            HFW)  # You may replace 8.29 with the HFW of your SEM
+                    SEM_Sensor.analyze_image(save_path, label_path, HFW)
                 else:  # 'video' or 'stream'
                     if vid_path[i] != save_path:  # new video
                         vid_path[i] = save_path
@@ -252,6 +259,7 @@ def parse_opt():
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
+    parser.add_argument('--HFW', type=float, default=8.29, help='HFW (Half Field Width) in micrometers')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))
