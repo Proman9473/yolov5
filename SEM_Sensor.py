@@ -91,7 +91,7 @@ def plot_annotations_with_widths(image_path, annotations, HFW):
     return width, height, X_positions, Y_positions
 
 
-def analyze_image(image_path, yolo_annotations_path, HFW=8.29):
+def analyze_image(image_path, yolo_annotations_path, HFW):
     annotations = read_yolo_annotations(yolo_annotations_path)
     width, height, X_positions, Y_positions = plot_annotations_with_widths(image_path, annotations, HFW)
 
@@ -100,12 +100,11 @@ def analyze_image(image_path, yolo_annotations_path, HFW=8.29):
     titles = ['Object Widths', 'Object Heights', 'Object X Positions', 'Object Y Positions']
     colors = ['blue', 'green', 'purple', 'orange']
 
-    image_dir = os.path.dirname(image_path)  # gets the directory of the image
+    # Extract the name of the image without the extension
     image_name = os.path.basename(image_path).split('.')[0]
-
-    # creates a new directory with the image name inside the image directory
-    result_dir = os.path.join(image_dir, image_name)
-    os.makedirs(result_dir, exist_ok=True)
+    result_dir = os.path.join(os.path.dirname(image_path), image_name)
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
 
     # Loop through the datasets and create/save the plots
     for data, title, color in zip(datasets, titles, colors):
@@ -117,9 +116,7 @@ def analyze_image(image_path, yolo_annotations_path, HFW=8.29):
         plt.savefig(os.path.join(result_dir, f'histogram_{image_name}_{title.lower().replace(" ", "_")}.png'))
         plt.show()
 
-    output_file_path = os.path.join(result_dir, "object_information.txt")  # save the text file in the image directory
-
-    output_file_path = "object_information.txt"
+    output_file_path = os.path.join(result_dir, "object_information.txt")
     object_info = f"Number of objects: {len(annotations)}\n"
     object_info += f"X position range: min = {min(X_positions):.2f} nm, max = {max(X_positions):.2f} nm\n"
     object_info += f"Y position range: min = {min(Y_positions):.2f} nm, max = {max(Y_positions):.2f} nm\n"
